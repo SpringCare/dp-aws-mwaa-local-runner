@@ -96,6 +96,29 @@ just open
 
 See all available commands with `just --list` or refer to the [justfile](justfile).
 
+### Quick Start with Just (Recommended)
+
+If you have `just` installed, you can use simplified commands:
+
+```bash
+# First-time setup (creates config files, exports Zscaler cert if needed)
+just setup
+
+# Edit docker/config/.env.localrunner with your personal settings
+# Edit docker/docker-compose-local.override.yml to mount your DAGs
+
+# Build the Docker image
+just build
+
+# Start the environment
+just start
+
+# Open the Airflow UI
+just open
+```
+
+See all available commands with `just --list` or refer to the [justfile](justfile).
+
 ### Step one: Building the Docker image
 
 Build the Docker container image using the following command:
