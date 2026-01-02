@@ -12,10 +12,6 @@ _Please note: MWAA/AWS/DAG/Plugin issues should be raised through AWS Support or
 _Please note: The dynamic configurations which are dependent on the class of an environment are
 aligned with the Large environment class in this repository._
 
-## About the CLI
-
-The CLI builds a Docker container image locally that's similar to a MWAA production image. This allows you to run a local Apache Airflow environment to develop and test DAGs, custom plugins, and dependencies before deploying to MWAA.
-
 ## What this repo contains
 
 ```text
@@ -72,8 +68,7 @@ VERSION
 ## Get started
 
 ```bash
-git clone https://github.com/aws/aws-mwaa-local-runner.git
-cd aws-mwaa-local-runner
+git clone git@github.com:SpringCare/dp-aws-mwaa-local-runner.git
 ```
 
 ### Quick Start with Just (Recommended)
@@ -83,10 +78,12 @@ If you have `just` installed, you can use simplified commands:
 ```bash
 # First-time setup (creates config files, exports Zscaler cert if needed)
 just setup
+```
+Setup will create 2 files docker/config/.env.localrunner and docker/docker-compose-local.override.yml
+- Edit docker/config/.env.localrunner with your personal settings
+- Edit docker/docker-compose-local.override.yml to mount your DAGs, see docker/docker-compose-local.override.example
 
-# Edit docker/config/.env.localrunner with your personal settings
-# Edit docker/docker-compose-local.override.yml to mount your DAGs
-
+```bash
 # Build the Docker image
 just build
 
