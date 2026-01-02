@@ -26,10 +26,23 @@ services:
         max-size: 10m
         max-file: "3"
     volumes:
-      - "${PWD}/dags:/usr/local/airflow/dags"
       - "${PWD}/plugins:/usr/local/airflow/plugins"
       - "${PWD}/requirements:/usr/local/airflow/requirements"
       - "${PWD}/startup_script:/usr/local/airflow/startup"
+      # # Mount requirements from dp_airflow_pipelines (auto-installed on startup)
+      - "${DP_AIRFLOW_PATH:-${PWD}/../dp_airflow_pipelines}/requirements:/usr/local/airflow/dp_requirements:ro"
+      # Base dags folder (for __init__.py and any local example DAGs)
+      - "${PWD}/dags:/usr/local/airflow/dags"
+      # Supporting modules from dp_airflow_pipelines (default: sibling directory)
+      # Override DP_AIRFLOW_PATH in .env.localrunner if repos are elsewhere
+      - "${DP_AIRFLOW_PATH:-${PWD}/../dp_airflow_pipelines}/src/pipeline:/usr/local/airflow/dags/pipeline"
+      - "${DP_AIRFLOW_PATH:-${PWD}/../dp_airflow_pipelines}/src/shared:/usr/local/airflow/dags/shared"
+      # # Mount source dags folder for startup script to sync shared files (constants.py, etc.)
+      - "${DP_AIRFLOW_PATH:-${PWD}/../dp_airflow_pipelines}/src/dags:/usr/local/airflow/dp_source_dags:ro"
+      # # Mount AWS credentials for SSO access to Secrets Manager
+      - "${HOME}/.aws:/usr/local/airflow/.aws:ro"
+      # NOTE: Specific DAGs are mounted via docker-compose-local.override.yml
+      # See docker-compose-local.override.example.yml for template
     ports:
       - "8080:8080"
     command: local-runner
