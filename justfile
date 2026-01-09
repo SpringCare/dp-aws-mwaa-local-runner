@@ -139,7 +139,7 @@ status:
 
 # AWS SSO login (run before starting if session expired)
 sso-login profile="siham-dev":
-    aws sso login --profile {{profile}}
+    aws configure sso --profile {{profile}}
 
 # Get a secret from AWS Secrets Manager
 get-secret secret_name profile="siham-dev":

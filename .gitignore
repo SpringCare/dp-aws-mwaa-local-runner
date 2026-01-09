@@ -7,7 +7,7 @@ dags/**/*.pyc
 .DS_Store
 
 # Personal environment config (use .env.example as template)
-docker/config/.env.localrunner
+# docker/config/.env.localrunner
 
 # Zscaler certificate (each user exports their own)
 docker/config/zscaler-root-ca.crt

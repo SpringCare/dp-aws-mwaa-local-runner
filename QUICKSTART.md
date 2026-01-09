@@ -54,20 +54,9 @@ This creates two files (both gitignored):
 - `docker/config/.env.localrunner` - Your personal environment config
 - `docker/docker-compose-local.override.yml` - Your personal DAG mounts
 
-## Step 3: Configure Your Environment
+## Step 3: Configure Your Environment - if needed
 
 Edit `docker/config/.env.localrunner` with your personal values:
-
-```bash
-# Required - Your AWS SSO profile name
-PIPELINE_AWS_PROFILE=your-profile-name
-
-# Required - Your Snowflake username (email)
-SNOWFLAKE_USERNAME=you@springhealth.com
-
-# Optional - Airflow admin password (default: admin)
-DEFAULT_PASSWORD=admin
-```
 
 **Note**: Most environment variables (secret names, bucket names, API URLs) are automatically loaded from `dp_airflow_pipelines/mwaa/startup-validation.sh`. You only need to set personal values here. See [Environment Variables](#environment-variables) for details.
 
