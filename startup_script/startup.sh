@@ -3,26 +3,37 @@
 echo "Running startup script..."
 
 # =============================================================================
-# Sync shared files from dp_airflow_pipelines
+# Load environment variables from dp_airflow_pipelines MWAA scripts
 # =============================================================================
-if [ -d /usr/local/airflow/dp_source_dags ]; then
-    echo "Syncing shared files from dp_airflow_pipelines..."
+# This sources the same env vars used in actual MWAA, ensuring consistency.
+# The startup-validation.sh file contains all secret names, bucket names, etc.
+
+MWAA_ENV_FILE="/usr/local/airflow/mwaa_scripts/startup-validation.sh"
+
+if [ -f "$MWAA_ENV_FILE" ]; then
+    echo "Loading environment variables from dp_airflow_pipelines/mwaa..."
     
-    # Copy constants.py (used by many DAGs)
-    if [ -f /usr/local/airflow/dp_source_dags/constants.py ]; then
-        cp /usr/local/airflow/dp_source_dags/constants.py /usr/local/airflow/dags/constants.py
-        echo "  ✓ constants.py"
-    fi
+    # Extract and execute only 'export' statements (skip airflow commands, comments)
+    eval "$(grep '^export ' "$MWAA_ENV_FILE")"
     
-    # Copy __init__.py if it exists
-    if [ -f /usr/local/airflow/dp_source_dags/__init__.py ]; then
-        cp /usr/local/airflow/dp_source_dags/__init__.py /usr/local/airflow/dags/__init__.py
-        echo "  ✓ __init__.py"
-    fi
-    
-    echo "Sync complete."
+    echo "  ✓ Environment variables loaded from startup-validation.sh"
 else
-    echo "Warning: dp_source_dags not mounted. Some imports may fail."
+    echo "Warning: MWAA scripts not mounted. Environment variables may be missing."
+    echo "         Expected: $MWAA_ENV_FILE"
+fi
+
+# =============================================================================
+# Override for local development
+# =============================================================================
+# These override the MWAA values for local testing
+
+export EXECUTION_ENVIRONMENT='local'
+
+# Allow INGEST_CONFIG_URL to be overridden via .env.localrunner
+# Default to local Config API if not set
+if [ -z "$INGEST_CONFIG_URL" ] || [ "$INGEST_CONFIG_URL" = "http://ingest-config-nlb-validation-5dac583427c273d3.elb.us-east-1.amazonaws.com" ]; then
+    export INGEST_CONFIG_URL="http://host.docker.internal:3000"
+    echo "  ✓ INGEST_CONFIG_URL set to local: $INGEST_CONFIG_URL"
 fi
 
 # =============================================================================
@@ -41,3 +52,5 @@ if [ -d /usr/local/airflow/dp_requirements ]; then
 else
     echo "Warning: dp_requirements not mounted. Using local requirements only."
 fi
+
+echo "Startup script complete."
