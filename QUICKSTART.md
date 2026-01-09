@@ -82,9 +82,8 @@ services:
 
 ## Step 5: Login to AWS
 
-```bash
-just sso-login
-```
+Make sure you're logged into AWS using SSO.
+Note: make sure your profile has a region in your `~./aws/config` file.
 
 ## Step 6: Build & Start
 

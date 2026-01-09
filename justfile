@@ -137,11 +137,3 @@ shell:
 status:
     @just compose ps
 
-# AWS SSO login (run before starting if session expired)
-sso-login profile="siham-dev":
-    aws configure sso --profile {{profile}}
-
-# Get a secret from AWS Secrets Manager
-get-secret secret_name profile="siham-dev":
-    aws secretsmanager get-secret-value --secret-id {{secret_name}} --profile {{profile}} --query SecretString --output text | jq .
-
