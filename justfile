@@ -15,36 +15,53 @@ override_file := "./docker/docker-compose-local.override.yml"
 
 # First-time setup for new teammates
 setup:
-    @echo "🚀 Setting up MWAA local runner..."
-    @echo ""
-    @# Create personal env config from template
-    @if [ ! -f docker/config/.env.localrunner ]; then \
-        cp docker/config/.env.example docker/config/.env.localrunner; \
-        echo "✅ Created docker/config/.env.localrunner from template"; \
-    else \
-        echo "⏭️  docker/config/.env.localrunner already exists"; \
+    #!/usr/bin/env bash
+    set -e
+    echo "🚀 Setting up MWAA local runner..."
+    echo ""
+    
+    # Create personal env config
+    if [ ! -f docker/config/.env.localrunner ]; then
+        echo "📝 Let's configure your environment..."
+        echo ""
+        
+        # Prompt for AWS profile
+        echo "Available AWS profiles:"
+        grep '^\[profile' ~/.aws/config 2>/dev/null | sed 's/\[profile /  - /g' | sed 's/\]//g' || echo "  (none found)"
+        echo ""
+        read -p "Enter your AWS SSO profile name: " aws_profile
+        
+        # Prompt for Snowflake username
+        read -p "Enter your Snowflake username (email): " snowflake_user
+        
+        # Create .env.localrunner with user values
+        sed -e "s/your-profile-name/${aws_profile}/g" \
+            -e "s/your.email@springhealth.com/${snowflake_user}/g" \
+            docker/config/.env.example > docker/config/.env.localrunner
+        
+        echo ""
+        echo "✅ Created docker/config/.env.localrunner with your settings"
+    else
+        echo "⏭️  docker/config/.env.localrunner already exists"
     fi
-    @# Create personal DAG mounts from template
-    @if [ ! -f docker/docker-compose-local.override.yml ]; then \
-        cp docker/docker-compose-local.override.example.yml docker/docker-compose-local.override.yml; \
-        echo "✅ Created docker/docker-compose-local.override.yml from template"; \
-    else \
-        echo "⏭️  docker/docker-compose-local.override.yml already exists"; \
+    
+    # Create personal DAG mounts from template
+    if [ ! -f docker/docker-compose-local.override.yml ]; then
+        cp docker/docker-compose-local.override.example.yml docker/docker-compose-local.override.yml
+        echo "✅ Created docker/docker-compose-local.override.yml from template"
+    else
+        echo "⏭️  docker/docker-compose-local.override.yml already exists"
     fi
-    @echo ""
-    @just setup-zscaler
-    @echo ""
-    @echo "📝 Next steps:"
-    @echo "   1. Edit docker/config/.env.localrunner with your personal values:"
-    @echo "      - PIPELINE_AWS_PROFILE (your AWS SSO profile name)"
-    @echo "      - AWS_PROFILE (same as above)"
-    @echo "      - SNOWFLAKE_USERNAME (your email)"
-    @echo ""
-    @echo "   2. Edit docker/docker-compose-local.override.yml to mount your DAGs"
-    @echo ""
-    @echo "   3. Run: just sso-login"
-    @echo "   4. Run: just build"
-    @echo "   5. Run: just start"
+    
+    echo ""
+    just setup-zscaler
+    echo ""
+    echo "📝 Next steps:"
+    echo "   1. Edit docker/docker-compose-local.override.yml to mount your DAGs"
+    echo ""
+    echo "   2. Run: just sso-login"
+    echo "   3. Run: just build"
+    echo "   4. Run: just start"
 
 # Export Zscaler certificate for SSL in Docker
 setup-zscaler:
@@ -119,12 +136,4 @@ shell:
 # Check container status
 status:
     @just compose ps
-
-# AWS SSO login (run before starting if session expired)
-sso-login profile="siham-dev":
-    aws sso login --profile {{profile}}
-
-# Get a secret from AWS Secrets Manager
-get-secret secret_name profile="siham-dev":
-    aws secretsmanager get-secret-value --secret-id {{secret_name}} --profile {{profile}} --query SecretString --output text | jq .
 
