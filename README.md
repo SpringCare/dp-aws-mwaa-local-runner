@@ -232,7 +232,6 @@ For example usage see [Installing Python dependencies using PyPi.org Requirement
 | `just open` | Open Airflow UI in browser |
 | `just reset` | Wipe database and restart fresh |
 | `just status` | Check container status |
-| `just sso-login` | AWS SSO login |
 | `just get-secret <name>` | Get secret from AWS Secrets Manager |
 
 ## Configuration

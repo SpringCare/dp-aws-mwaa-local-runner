@@ -59,9 +59,8 @@ setup:
     echo "📝 Next steps:"
     echo "   1. Edit docker/docker-compose-local.override.yml to mount your DAGs"
     echo ""
-    echo "   2. Run: just sso-login"
-    echo "   3. Run: just build"
-    echo "   4. Run: just start"
+    echo "   2. Run: just build"
+    echo "   3. Run: just start"
 
 # Export Zscaler certificate for SSL in Docker
 setup-zscaler:
