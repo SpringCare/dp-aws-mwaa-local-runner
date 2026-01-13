@@ -43,6 +43,8 @@ services:
       - "${DP_AIRFLOW_PATH:-${PWD}/../dp_airflow_pipelines}/mwaa:/usr/local/airflow/mwaa_scripts:ro"
       # Mount AWS credentials for SSO access to Secrets Manager
       - "${HOME}/.aws:/usr/local/airflow/.aws:ro"
+      # Mount CA certificates for SSL/Zscaler (if exists)
+      - "${HOME}/ca_certs:/usr/local/airflow/ca_certs:ro"
       # NOTE: Specific DAGs are mounted via docker-compose-local.override.yml
       # See docker-compose-local.override.example.yml for template
     ports:
